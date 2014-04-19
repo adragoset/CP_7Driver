@@ -5,6 +5,7 @@ using GTM = Gadgeteer.Modules;
 using GTI = Gadgeteer.SocketInterfaces;
 
 using Microsoft.SPOT.Hardware;
+using System.Threading;
 
 namespace Gadgeteer.Modules.GHIElectronics
 {
@@ -576,6 +577,7 @@ namespace Gadgeteer.Modules.GHIElectronics
 
         static byte ReadRegister(byte Address)
         {
+            int timeout = 0x10;
             I2CDevice.I2CTransaction[] xActions = new I2CDevice.I2CTransaction[2];
 
             // create write buffer (we need one byte)
@@ -584,14 +586,19 @@ namespace Gadgeteer.Modules.GHIElectronics
             // create read buffer to read the register
             byte[] RegisterValue = new byte[1];
             xActions[1] = I2CDevice.CreateReadTransaction(RegisterValue);
-
-            if (i2cBus.Execute(xActions) == 0)
+            while (timeout > 0)
             {
-                Debug.Print("Failed to perform I2C transaction");
-            }
-            else
-            {
-                //Debug.Print("Register value: " + RegisterValue[0].ToString());
+                if (i2cBus.Execute(xActions) == 0)
+                {
+                    //Debug.Print("Failed to perform I2C transaction");
+                    Thread.Sleep(10);
+                    timeout--;
+                }
+                else
+                {
+                    //Debug.Print("Register value: " + RegisterValue[0].ToString());
+                    timeout = 0;
+                }
             }
 
             return RegisterValue[0];
