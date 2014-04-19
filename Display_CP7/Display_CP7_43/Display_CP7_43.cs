@@ -242,7 +242,7 @@ namespace Gadgeteer.Modules.GHIElectronics
             lcdConfig.VerticalFrontPorch = 7;
 
             // NOTE: This is used for ChipworkX, comment if using EMX.
-			//lcdConfig.PixelClockDivider = 5;
+            //lcdConfig.PixelClockDivider = 5;
             //dConfig.PixelClockRate = 25000;
             lcdConfig.MaximumClockSpeed = 24000;
 
@@ -472,7 +472,7 @@ namespace Gadgeteer.Modules.GHIElectronics
                 {
                     if (this.onScreenReleased == null)
                     {
-                        this.onScreenReleased = new TouchEventHandlerTouchReleased(OnReleasedEvent);
+                        this.onScreenReleased = new TouchEventHandlerTouchReleased(GenericScreenEvent);
                     }
 
                     if (Program.CheckAndInvoke(ScreenReleased, this.onScreenReleased, this))
@@ -493,7 +493,7 @@ namespace Gadgeteer.Modules.GHIElectronics
             if (gesture != (int)Gesture_ID.No_Gesture)
             {
                 if (this.onGestureDetected == null)
-                    this.onGestureDetected = new TouchGestureDetected(this.onGestureDetected);
+                    this.onGestureDetected = new TouchGestureDetected(GenericGestureEvent);
 
                 if (Program.CheckAndInvoke(GestureDetected, this.onGestureDetected, this, (Gesture_ID)gesture))
                     this.GestureDetected(this, (Gesture_ID)gesture);
@@ -526,7 +526,7 @@ namespace Gadgeteer.Modules.GHIElectronics
                         {
                             // Home
                             if (this.onHomePressed == null)
-                                this.onHomePressed = new TouchEventHandlerHomeButton(this.onHomePressed);
+                                this.onHomePressed = new TouchEventHandlerHomeButton(GenericScreenEvent);
 
                             if (Program.CheckAndInvoke(HomePressed, this.onHomePressed, this))
                                 this.HomePressed(this);
@@ -535,7 +535,7 @@ namespace Gadgeteer.Modules.GHIElectronics
                         {
                             // Menu
                             if (this.onMenuPressed == null)
-                                this.onMenuPressed = new TouchEventHandlerMenuButton(this.onMenuPressed);
+                                this.onMenuPressed = new TouchEventHandlerMenuButton(GenericScreenEvent);
 
                             if (Program.CheckAndInvoke(MenuPressed, this.onMenuPressed, this))
                                 this.MenuPressed(this);
@@ -544,7 +544,7 @@ namespace Gadgeteer.Modules.GHIElectronics
                         {
                             // Back
                             if (this.onBackPressed == null)
-                                this.onBackPressed = new TouchEventHandlerBackButton(this.onBackPressed);
+                                this.onBackPressed = new TouchEventHandlerBackButton(GenericScreenEvent);
 
                             if (Program.CheckAndInvoke(BackPressed, this.onBackPressed, this))
                                 this.BackPressed(this);
@@ -570,7 +570,10 @@ namespace Gadgeteer.Modules.GHIElectronics
             }
         }
 
-        protected virtual void OnReleasedEvent(DisplayCP7 sender) { }
+        protected virtual void GenericGestureEvent(DisplayCP7 sender, Gesture_ID id) { }
+
+        protected virtual void GenericScreenEvent(DisplayCP7 sender) { }
+
         static byte ReadRegister(byte Address)
         {
             I2CDevice.I2CTransaction[] xActions = new I2CDevice.I2CTransaction[2];
