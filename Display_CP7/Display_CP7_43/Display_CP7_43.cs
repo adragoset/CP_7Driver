@@ -6,6 +6,7 @@ using GTI = Gadgeteer.SocketInterfaces;
 
 using Microsoft.SPOT.Hardware;
 using System.Threading;
+using System;
 
 namespace Gadgeteer.Modules.GHIElectronics
 {
@@ -271,9 +272,12 @@ namespace Gadgeteer.Modules.GHIElectronics
             }
         }
 
+        
+      
+
         private void _input_Interrupt(GTI.InterruptInput input, bool value)
-        {
-            this.OnTouchEvent(this, null);
+        {   
+                this.OnTouchEvent(this, null);
         }
 
         private GTI.InterruptInput touchInterrupt;
@@ -476,9 +480,9 @@ namespace Gadgeteer.Modules.GHIElectronics
                         this.onScreenReleased = new TouchEventHandlerTouchReleased(GenericScreenEvent);
                     }
 
-                    if (Program.CheckAndInvoke(ScreenReleased, this.onScreenReleased, this))
+                    if (Program.CheckAndInvoke(ScreenReleased, this.onScreenReleased, sender))
                     {
-                        this.ScreenReleased(this);
+                        this.ScreenReleased(sender);
 
                         bSentReleased = true;
                     }
@@ -588,16 +592,25 @@ namespace Gadgeteer.Modules.GHIElectronics
             xActions[1] = I2CDevice.CreateReadTransaction(RegisterValue);
             while (timeout > 0)
             {
-                if (i2cBus.Execute(xActions) == 0)
+                try
+                {
+                    if (i2cBus.Execute(xActions) == 0)
+                    {
+                        //Debug.Print("Failed to perform I2C transaction");
+                        Thread.Sleep(10);
+                        timeout--;
+                    }
+                    else
+                    {
+                        //Debug.Print("Register value: " + RegisterValue[0].ToString());
+                        timeout = 0;
+                    }
+                }
+                catch
                 {
                     //Debug.Print("Failed to perform I2C transaction");
                     Thread.Sleep(10);
                     timeout--;
-                }
-                else
-                {
-                    //Debug.Print("Register value: " + RegisterValue[0].ToString());
-                    timeout = 0;
                 }
             }
 
